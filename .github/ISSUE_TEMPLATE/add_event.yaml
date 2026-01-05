@@ -7,14 +7,14 @@ body:
     attributes:
       value: |
         Use this form to request or notify of NeoNephos attendance on an event. Feel free to fill out this form for each event you have in mind, even if you are unsure if the event is suitable for NeoNephos.
-    - type: textarea
+  - type: textarea
     id: event-date
     attributes:
       label: Event Date
       description: When does the event occur? For events spanning multiple days, choose the first day of the event.
     validations:
       required: true
-    - type: textarea
+  - type: textarea
     id: event-name
     attributes:
       label: Event Name
