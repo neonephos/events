@@ -12,6 +12,7 @@ body:
     attributes:
       label: Event Date
       description: When does the event occur? For events spanning multiple days, choose the first day of the event.
+      placeholder: 2026-01-25
     validations:
       required: true
   - type: textarea
