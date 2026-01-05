@@ -1,0 +1,59 @@
+name: Add event
+description: Template for adding an event.
+title: "[Request]: - EVENT NAME"
+labels: ["foundational-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request or notify of NeoNephos attendance on an event. Feel free to fill out this form for each event you have in mind, even if you are unsure if the event is suitable for NeoNephos.
+  - type: textarea
+    id: event-name
+    attributes:
+      label: Event Name
+      description: What is the name of the event that might be of interest to NeoNephos?
+    validations:
+      required: true
+  - type: textarea
+    id: event-link
+    attributes:
+      label: More Information
+      description: Please provide a link to the event.
+    validations:
+      required: true
+  - type: textarea
+    id: intended-involvement-description
+    attributes:
+      label: Event Involvement from NeoNephos
+      description: Briefly explain how you think NeoNephos should be presented at the event (e.g. holding talks, having a booth, sponsoring).
+    validations:
+      required: true  
+  - type: textarea
+    id: attendees
+    attributes:
+      label: Event Attendees
+      description: If available, please list who attends the event.
+    validations:
+      required: false  
+  - type: textarea
+    id: benefit-description
+    attributes:
+      label: Benefit to NeoNephos
+      description: Briefly describe how NeoNephos would benefit from this event.
+    validations:
+      required: true  
+  - type: textarea
+    id: cost-description
+    attributes:
+      label: Estimated Costs
+      description: If available, write down the estimated costs to the foundation. Please note if these are one-time or recurring costs. If recurring, please specify the billing period.
+    validations:
+      required: false           
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Good Faith
+      description: By submitting this issue, you agree to have filled out all information to the best of your knowledge.
+      options:
+        - label: I agree
+          required: true
