@@ -1,6 +1,6 @@
 # Events
 
-The event board lists all proposed, upcoming and past events that are attended by the NeoNephos Foundation.
+The events board lists all proposed, upcoming and past events that are attended by the NeoNephos Foundation.
 All events have in common that they are of interest to the NeoNephos Foundation as a whole as opposed to just an individual project.
 
 ## How to propose a project
