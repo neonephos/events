@@ -106,4 +106,3 @@ jobs:
 
               console.log(`Commented on #${issue_number}`);
             }
-``
