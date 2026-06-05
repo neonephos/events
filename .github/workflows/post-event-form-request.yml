@@ -1,5 +1,5 @@
 ---
-name: Comment when event attended
+name: Comment when event attended to request submission of post-event form
 on:
   schedule:
     - cron: "*/5 * * * *"
