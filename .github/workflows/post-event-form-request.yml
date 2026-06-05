@@ -1,26 +1,29 @@
 name: Comment when event attended to request submission of post-event form
+
 on:
   schedule:
     - cron: "*/5 * * * *"
-  workflow_dispatch: null
+  workflow_dispatch:
+
 permissions:
   issues: write
   contents: read
   repository-projects: read
+
 jobs:
   check-attended:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Run script
+      - name: Comment on attended issues
         uses: actions/github-script@v7
         with:
-          script: >
-            const PROJECT_NUMBER = 8; // <-- change this!
-
+          script: |
+            const PROJECT_NUMBER = 8; // <-- your project number
 
             const query = `
-              query($owner: String!, $repo: String!, $number: Int!) {
-                repository(owner: $owner, name: $repo) {
+              query($org: String!, $number: Int!) {
+                organization(login: $org) {
                   projectV2(number: $number) {
                     items(first: 50) {
                       nodes {
@@ -52,16 +55,12 @@ jobs:
               }
             `;
 
-
             const result = await github.graphql(query, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              org: context.repo.owner,
               number: PROJECT_NUMBER
             });
 
-
-            const items = result.repository.projectV2.items.nodes;
-
+            const items = result.organization.projectV2.items.nodes;
 
             for (const item of items) {
               if (!item.content) continue;
@@ -72,7 +71,9 @@ jobs:
                 f => f.field && f.field.name === "Status"
               );
 
-              if (!statusField || statusField.name !== "Attended") continue;
+              if (!statusField) continue;
+
+              if (statusField.name !== "Attended") continue;
 
               const owner = issue.repository.owner.login;
               const repo = issue.repository.name;
@@ -105,3 +106,4 @@ jobs:
 
               console.log(`Commented on #${issue_number}`);
             }
+``
