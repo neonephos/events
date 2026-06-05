@@ -75,7 +75,7 @@ jobs:
             const issue_number = issue.number;
 
             const marker = "<!-- attended-comment -->";
-            const message = `${marker} Thank you for attending the event. Please fill out this form as soon as you possible: https://4tvhy.share.hsforms.com/2jHn33dUtSlGGKp8_y6WIOw`;
+            const message = `${marker} Thank you for attending the event. Please fill out this form: https://4tvhy.share.hsforms.com/2jHn33dUtSlGGKp8_y6WIOw`;
 
             // Fetch existing comments
             const comments = await github.rest.issues.listComments({
