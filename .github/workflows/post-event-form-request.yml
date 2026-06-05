@@ -1,46 +1,50 @@
----
 name: Comment when event attended
+
 on:
-  projects_v2_item:
-    types:
-      - edited
+  schedule:
+    - cron: "*/5 * * * *"   # every 5 minutes
+  workflow_dispatch:
+
 permissions:
   issues: write
   contents: read
   repository-projects: read
+
 jobs:
-  comment-on-attended:
+  check-attended:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Check status and comment
+      - name: Run script
         uses: actions/github-script@v7
         with:
-          script: >
-            const ITEM = context.payload.projects_v2_item;
-
-            const itemNodeId = ITEM.node_id;
-
+          script: |
+            const PROJECT_NUMBER = 1; // <-- change this!
 
             const query = `
-              query ($item: ID!) {
-                node(id: $item) {
-                  ... on ProjectV2Item {
-                    content {
-                      ... on Issue {
-                        number
-                        repository {
-                          name
-                          owner { login }
-                        }
-                      }
-                    }
-                    fieldValues(first: 20) {
+              query($owner: String!, $repo: String!, $number: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  projectV2(number: $number) {
+                    items(first: 50) {
                       nodes {
-                        ... on ProjectV2ItemFieldSingleSelectValue {
-                          name
-                          field {
-                            ... on ProjectV2SingleSelectField {
+                        content {
+                          ... on Issue {
+                            number
+                            repository {
                               name
+                              owner { login }
+                            }
+                          }
+                        }
+                        fieldValues(first: 20) {
+                          nodes {
+                            ... on ProjectV2ItemFieldSingleSelectValue {
+                              name
+                              field {
+                                ... on ProjectV2SingleSelectField {
+                                  name
+                                }
+                              }
                             }
                           }
                         }
@@ -51,67 +55,54 @@ jobs:
               }
             `;
 
-
             const result = await github.graphql(query, {
-              item: itemNodeId
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              number: PROJECT_NUMBER
             });
 
+            const items = result.repository.projectV2.items.nodes;
 
-            const item = result.node;
+            for (const item of items) {
+              if (!item.content) continue;
 
-            if (!item || !item.content) return;
+              const issue = item.content;
 
+              const statusField = item.fieldValues.nodes.find(
+                f => f.field && f.field.name === "Status"
+              );
 
-            const issue = item.content;
+              if (!statusField || statusField.name !== "Attended") continue;
 
+              const owner = issue.repository.owner.login;
+              const repo = issue.repository.name;
+              const issue_number = issue.number;
 
-            const statusField = item.fieldValues.nodes.find(
-              f => f.field && f.field.name === "Status"
-            );
+              const marker = "<!-- attended-comment -->";
+              const message = `${marker} Thank you for attending the event. Please fill out this form: https://4tvhy.share.hsforms.com/2jHn33dUtSlGGKp8_y6WIOw`;
 
+              const comments = await github.rest.issues.listComments({
+                owner,
+                repo,
+                issue_number,
+              });
 
-            if (!statusField || statusField.name !== "Attended") {
-              console.log("Not attended.");
-              return;
+              const alreadyPosted = comments.data.some(c =>
+                c.body.includes(marker)
+              );
+
+              if (alreadyPosted) {
+                console.log(`Already commented on #${issue_number}`);
+                continue;
+              }
+
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body: message,
+              });
+
+              console.log(`Commented on #${issue_number}`);
             }
-
-
-            const owner = issue.repository.owner.login;
-
-            const repo = issue.repository.name;
-
-            const issue_number = issue.number;
-
-
-            const marker = "<!-- attended-comment -->";
-
-            const message = `${marker} Thank you for attending the event. Please fill out this form: https://4tvhy.share.hsforms.com/2jHn33dUtSlGGKp8_y6WIOw`;
-
-
-            const comments = await github.rest.issues.listComments({
-              owner,
-              repo,
-              issue_number,
-            });
-
-
-            const alreadyPosted = comments.data.some(c =>
-              c.body.includes(marker)
-            );
-
-
-            if (alreadyPosted) {
-              console.log("Already commented.");
-              return;
-            }
-
-
-            await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number,
-              body: message,
-            });
-
-
-            console.log("Comment posted.");
+``
