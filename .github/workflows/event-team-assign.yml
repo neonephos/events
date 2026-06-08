@@ -1,0 +1,22 @@
+name: Auto assign team on issue creation
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  assign-team:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign issue to team
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue_number = context.payload.issue.number;
+
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue_number,
+              assignees: ["neonephos/outreach-events"]
+            });
