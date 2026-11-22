@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Comment on attended issues
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
             const PROJECT_NUMBER = 8; // <-- your project number
